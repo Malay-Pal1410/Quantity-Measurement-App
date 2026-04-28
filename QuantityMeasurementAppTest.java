@@ -1,37 +1,31 @@
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class QuantityMeasurementAppTest {
 
+    private static final double EPSILON = 1e-6;
+
     @Test
-    void testYardToFeet() {
-        assertTrue(
-                new QuantityMeasurementApp.Quantity(1.0, QuantityMeasurementApp.Unit.YARDS)
-                        .equals(new QuantityMeasurementApp.Quantity(3.0, QuantityMeasurementApp.Unit.FEET))
+    void testFeetToInches() {
+        assertEquals(12.0,
+                QuantityMeasurementApp.convert(
+                        1.0,
+                        QuantityMeasurementApp.Unit.FEET,
+                        QuantityMeasurementApp.Unit.INCHES
+                ),
+                EPSILON
         );
     }
 
     @Test
-    void testYardToInches() {
-        assertTrue(
-                new QuantityMeasurementApp.Quantity(1.0, QuantityMeasurementApp.Unit.YARDS)
-                        .equals(new QuantityMeasurementApp.Quantity(36.0, QuantityMeasurementApp.Unit.INCHES))
-        );
-    }
-
-    @Test
-    void testCmToInches() {
-        assertTrue(
-                new QuantityMeasurementApp.Quantity(1.0, QuantityMeasurementApp.Unit.CENTIMETERS)
-                        .equals(new QuantityMeasurementApp.Quantity(0.393701, QuantityMeasurementApp.Unit.INCHES))
-        );
-    }
-
-    @Test
-    void testDifferentValues() {
-        assertFalse(
-                new QuantityMeasurementApp.Quantity(1.0, QuantityMeasurementApp.Unit.YARDS)
-                        .equals(new QuantityMeasurementApp.Quantity(2.0, QuantityMeasurementApp.Unit.FEET))
+    void testYardsToFeet() {
+        assertEquals(9.0,
+                QuantityMeasurementApp.convert(
+                        3.0,
+                        QuantityMeasurementApp.Unit.YARDS,
+                        QuantityMeasurementApp.Unit.FEET
+                ),
+                EPSILON
         );
     }
 }

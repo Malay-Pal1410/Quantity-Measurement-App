@@ -1,11 +1,13 @@
 public class QuantityMeasurementApp {
 
-    // ✅ ENUM (extended for UC4)
-    enum Unit {
+    private static final double EPSILON = 1e-6;
+
+    // ✅ 1. ENUM comes first (recommended)
+    public enum Unit {
         FEET(1.0),
         INCHES(1.0 / 12.0),
-        YARDS(3.0),                 // 1 yard = 3 feet
-        CENTIMETERS(0.0328084);     // 1 cm = 0.0328084 feet
+        YARDS(3.0),
+        CENTIMETERS(0.0328084);
 
         private final double toFeet;
 
@@ -16,50 +18,56 @@ public class QuantityMeasurementApp {
         public double toFeet(double value) {
             return value * toFeet;
         }
+
+        public double fromFeet(double feetValue) {
+            return feetValue / toFeet;
+        }
     }
 
-    // ✅ Generic Quantity class
+    // ✅ 2. PASTE YOUR Quantity CLASS HERE 👇
     static class Quantity {
-        private final double value;
-        private final Unit unit;
+
+        private static final double EPSILON = 1e-6;
+
+        private double value;
+        private Unit unit;
 
         public Quantity(double value, Unit unit) {
-            if (unit == null) {
-                throw new IllegalArgumentException("Unit cannot be null");
-            }
             this.value = value;
             this.unit = unit;
-        }
-
-        // Convert to base unit (feet)
-        private double toFeet() {
-            return unit.toFeet(value);
         }
 
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
-            if (obj == null || getClass() != obj.getClass()) return false;
+            if (!(obj instanceof Quantity)) return false;
 
             Quantity other = (Quantity) obj;
 
-            double diff = Math.abs(this.toFeet() - other.toFeet());
+            double thisInFeet = unit.toFeet(value);
+            double otherInFeet = other.unit.toFeet(other.value);
 
-            return diff < 0.0001;   // ✅ tolerance (VERY IMPORTANT)
+            return Math.abs(thisInFeet - otherInFeet) < EPSILON;
         }
     }
 
-    // ✅ Main method (Demo)
+    // ✅ 3. convert() method
+    public static double convert(double value, Unit source, Unit target) {
+        if (source == null || target == null)
+            throw new IllegalArgumentException("Unit cannot be null");
+
+        if (!Double.isFinite(value))
+            throw new IllegalArgumentException("Invalid number");
+
+        double valueInFeet = source.toFeet(value);
+        return target.fromFeet(valueInFeet);
+    }
+
+    // ✅ 4. main method (optional)
     public static void main(String[] args) {
+        Quantity q1 = new Quantity(1.0, Unit.FEET);
+        Quantity q2 = new Quantity(12.0, Unit.INCHES);
 
-        Quantity q1 = new Quantity(1.0, Unit.YARDS);
-        Quantity q2 = new Quantity(3.0, Unit.FEET);
-
-        System.out.println("1 yard == 3 feet ? " + q1.equals(q2));
-
-        Quantity q3 = new Quantity(1.0, Unit.CENTIMETERS);
-        Quantity q4 = new Quantity(0.393701, Unit.INCHES);
-
-        System.out.println("1 cm == 0.393701 inch ? " + q3.equals(q4));
+        System.out.println(q1.equals(q2)); // true
     }
 }
