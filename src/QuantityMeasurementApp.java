@@ -1,22 +1,24 @@
 public class QuantityMeasurementApp {
 
-    // Enum for units
+    // ✅ ENUM (extended for UC4)
     enum Unit {
         FEET(1.0),
-        INCH(1.0 / 12.0);
+        INCHES(1.0 / 12.0),
+        YARDS(3.0),                 // 1 yard = 3 feet
+        CENTIMETERS(0.0328084);     // 1 cm = 0.0328084 feet
 
-        private final double factor;
+        private final double toFeet;
 
-        Unit(double factor) {
-            this.factor = factor;
+        Unit(double toFeet) {
+            this.toFeet = toFeet;
         }
 
-        public double convertToFeet(double value) {
-            return value * factor;
+        public double toFeet(double value) {
+            return value * toFeet;
         }
     }
 
-    // Generic Quantity class
+    // ✅ Generic Quantity class
     static class Quantity {
         private final double value;
         private final Unit unit;
@@ -29,38 +31,35 @@ public class QuantityMeasurementApp {
             this.unit = unit;
         }
 
-        // Convert any unit to feet
+        // Convert to base unit (feet)
         private double toFeet() {
-            return unit.convertToFeet(value);
+            return unit.toFeet(value);
         }
 
-        // Equality check
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
-            if (!(obj instanceof Quantity)) return false;
+            if (obj == null || getClass() != obj.getClass()) return false;
 
             Quantity other = (Quantity) obj;
 
-            return Double.compare(this.toFeet(), other.toFeet()) == 0;
-        }
+            double diff = Math.abs(this.toFeet() - other.toFeet());
 
-        @Override
-        public String toString() {
-            return value + " " + unit;
+            return diff < 0.0001;   // ✅ tolerance (VERY IMPORTANT)
         }
     }
 
-    // Main method
+    // ✅ Main method (Demo)
     public static void main(String[] args) {
 
-        Quantity q1 = new Quantity(1.0, Unit.FEET);
-        Quantity q2 = new Quantity(12.0, Unit.INCH);
+        Quantity q1 = new Quantity(1.0, Unit.YARDS);
+        Quantity q2 = new Quantity(3.0, Unit.FEET);
 
-        Quantity q3 = new Quantity(5.0, Unit.FEET);
-        Quantity q4 = new Quantity(60.0, Unit.INCH);
+        System.out.println("1 yard == 3 feet ? " + q1.equals(q2));
 
-        System.out.println(q1 + " == " + q2 + " ? " + q1.equals(q2));
-        System.out.println(q3 + " == " + q4 + " ? " + q3.equals(q4));
+        Quantity q3 = new Quantity(1.0, Unit.CENTIMETERS);
+        Quantity q4 = new Quantity(0.393701, Unit.INCHES);
+
+        System.out.println("1 cm == 0.393701 inch ? " + q3.equals(q4));
     }
 }
