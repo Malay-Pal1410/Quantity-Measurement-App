@@ -1,26 +1,66 @@
 public class QuantityMeasurementApp {
 
-    static class Feet {
-        private final double value;
+    // Enum for units
+    enum Unit {
+        FEET(1.0),
+        INCH(1.0 / 12.0);
 
-        public Feet(double value) {
-            this.value = value;
+        private final double factor;
+
+        Unit(double factor) {
+            this.factor = factor;
         }
 
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (obj == null || getClass() != obj.getClass()) return false;
-
-            Feet other = (Feet) obj;
-            return Double.compare(this.value, other.value) == 0;
+        public double convertToFeet(double value) {
+            return value * factor;
         }
     }
 
-    public static void main(String[] args) {
-        Feet f1 = new Feet(1.0);
-        Feet f2 = new Feet(1.0);
+    // Generic Quantity class
+    static class Quantity {
+        private final double value;
+        private final Unit unit;
 
-        System.out.println("Are values equal? " + f1.equals(f2));
+        public Quantity(double value, Unit unit) {
+            if (unit == null) {
+                throw new IllegalArgumentException("Unit cannot be null");
+            }
+            this.value = value;
+            this.unit = unit;
+        }
+
+        // Convert any unit to feet
+        private double toFeet() {
+            return unit.convertToFeet(value);
+        }
+
+        // Equality check
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof Quantity)) return false;
+
+            Quantity other = (Quantity) obj;
+
+            return Double.compare(this.toFeet(), other.toFeet()) == 0;
+        }
+
+        @Override
+        public String toString() {
+            return value + " " + unit;
+        }
+    }
+
+    // Main method
+    public static void main(String[] args) {
+
+        Quantity q1 = new Quantity(1.0, Unit.FEET);
+        Quantity q2 = new Quantity(12.0, Unit.INCH);
+
+        Quantity q3 = new Quantity(5.0, Unit.FEET);
+        Quantity q4 = new Quantity(60.0, Unit.INCH);
+
+        System.out.println(q1 + " == " + q2 + " ? " + q1.equals(q2));
+        System.out.println(q3 + " == " + q4 + " ? " + q3.equals(q4));
     }
 }
